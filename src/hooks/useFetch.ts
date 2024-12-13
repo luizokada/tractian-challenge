@@ -26,8 +26,17 @@ interface useFetchTypes<T> {
   header?: {
     [key: string]: string | number | boolean | undefined;
   };
-  isPublicCall?: boolean;
 }
+
+/**
+ *@param {string} fetchName: Query key for react-query
+ *@param {AxiosStatic | AxiosInstance} axiosClient: Axios instance
+ *@param {string} url: URL to fetch
+ *@param {Object} params: Url query params
+ *@param {Omit<UseQueryOptions<T, ErrorType, T, QueryKey>, 'queryKey' | 'queryFn'>| undefined} options: Options for react-query
+ *@param {Object} header: Headers to fetch
+ *@returns { useFetchTypes<T>} Returns data from fetch, error, status and more
+ */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useFetch = <T = any>({

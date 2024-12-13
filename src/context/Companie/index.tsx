@@ -14,7 +14,7 @@ type CompanieContextType = {
   selectedCompany: string;
   setSelectedCompany: React.Dispatch<React.SetStateAction<string>>;
   assets: AssetFromApi | undefined;
-  location: LocationFromApi | undefined;
+  locations: LocationFromApi | undefined;
   selectedAsset: Asset | undefined;
   setSelectedAsset: React.Dispatch<React.SetStateAction<Asset | undefined>>;
 };
@@ -22,7 +22,7 @@ type CompanieContextType = {
 export const CompanieContext = createContext<CompanieContextType>({
   companies: undefined,
   assets: undefined,
-  location: undefined,
+  locations: undefined,
 
   selectedAsset: undefined,
   setSelectedAsset: () => {},
@@ -45,31 +45,59 @@ const CompanieProvider: React.FC<CompanieProviderProps> = ({ children }) => {
     axiosClient: TractionApi,
     options: {
       retry: false,
+      cacheTime: 10,
     },
   });
 
-  const { data: assets } = useFetch<AssetFromApi>({
+  const { data: assets, refetch: getAsset } = useFetch<AssetFromApi>({
     fetchName: ['getAssets', selectedCompany],
     url: `/companies/${selectedCompany}/assets`,
     axiosClient: TractionApi,
     options: {
       retry: false,
-      enabled: !!selectedCompany,
+      enabled: false,
+      cacheTime: 3600,
     },
   });
-  const { data: location } = useFetch<LocationFromApi>({
+  const { data: locations, refetch: getLocation } = useFetch<LocationFromApi>({
     fetchName: ['getLocation', selectedCompany],
     url: `/companies/${selectedCompany}/locations`,
     axiosClient: TractionApi,
     options: {
       retry: false,
-      enabled: !!selectedCompany,
+      enabled: false,
+      cacheTime: 3600,
     },
   });
 
   useEffect(() => {
-    queryClient.invalidateQueries('getAssets');
-    queryClient.invalidateQueries('getLocation');
+    if (!selectedCompany) return;
+
+    //get data from cache
+    const cachedLocationData = queryClient
+      .getQueryCache()
+      .find(['getLocation', selectedCompany])?.state?.data;
+
+    if (!cachedLocationData) {
+      getLocation();
+    }
+    const assetCachedData = queryClient
+      .getQueryCache()
+      .find(['getAssets', selectedCompany])?.state?.data;
+    if (!assetCachedData) {
+      getAsset();
+    }
+
+    if (cachedLocationData) {
+      queryClient.setQueryData(
+        ['getLocation', selectedCompany],
+        cachedLocationData,
+      );
+    }
+
+    if (assetCachedData) {
+      queryClient.setQueryData(['getAssets', selectedCompany], assetCachedData);
+    }
   }, [selectedCompany]);
 
   useEffect(() => {
@@ -85,7 +113,7 @@ const CompanieProvider: React.FC<CompanieProviderProps> = ({ children }) => {
         selectedCompany,
         setSelectedCompany,
         assets,
-        location,
+        locations,
         selectedAsset,
         setSelectedAsset,
       }}

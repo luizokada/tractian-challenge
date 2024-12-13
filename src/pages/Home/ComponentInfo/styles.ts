@@ -43,31 +43,69 @@ export const ComponentDetailInfoContainer = styled.div`
   gap: 32px;
 `;
 
+export const ImageWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  position: relative;
+  flex-direction: column;
+  gap: 16px;
+
+  background-color: ${({ theme }) => theme.Colors.Blue._300};
+  border: 1px dashed ${({ theme }) => theme.Colors.Blue._500};
+  flex: 1;
+  max-width: 400px;
+  max-height: 400px;
+  overflow: hidden;
+  > input {
+    display: none;
+  }
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+  .trash-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: ${({ theme }) => theme.Colors.Gray._100};
+    border-radius: 50%;
+  }
+  p {
+    color: ${({ theme }) => theme.Colors.Blue._900};
+    font-size: 16px;
+  }
+  &:hover .trash-icon {
+    display: flex;
+  }
+`;
+
+export const ImageInputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  max-width: 400px;
+  max-height: 400px;
+  > p {
+    font-size: 14px;
+    color: ${({ theme }) => theme.Colors.Red._800};
+  }
+`;
+
 export const FirstLineContainer = styled.div`
   height: 200px;
   display: flex;
   gap: 24px;
-  .image-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
 
-    background-color: ${({ theme }) => theme.Colors.Blue._300};
-    border: 1px dashed ${({ theme }) => theme.Colors.Blue._500};
-    flex: 1;
-    max-width: 400px;
-    max-height: 400px;
-    overflow: hidden;
-    > input {
-      display: none;
-    }
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: cover;
-    }
-  }
   .infos {
     display: flex;
     flex-direction: column;

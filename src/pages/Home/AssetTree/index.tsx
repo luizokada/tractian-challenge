@@ -1,12 +1,15 @@
-import React, { lazy, Suspense, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import SearchIcon from '../../../icons/SearchIcon';
 import { FilterType } from '../../../types/filter';
 import { Tree } from '../../../utils/Tree';
 import {
   AssetTreeListWrapper,
   AssetTreeWrapper,
+  LoaderWrapper,
   SearchInputContainer,
 } from './styles';
+import { useIsFetchingQueries } from '../../../hooks/useIsFetchingQueries';
+import Loader from '../../../commom/Loader';
 
 const AssetTreeList = lazy(() => import('./AssetTreeList'));
 
@@ -23,6 +26,13 @@ const AssetTree: React.FC<AssetTreeProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isFeatching = useIsFetchingQueries(['getAssets', 'getLocations']);
+
+  const isLoading = useMemo(() => {
+    console.log('isFeatching', isFeatching);
+    return !!isFeatching;
+  }, [isFeatching]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -62,17 +72,26 @@ const AssetTree: React.FC<AssetTreeProps> = ({
           <SearchIcon />
         </div>
       </SearchInputContainer>
-      <AssetTreeListWrapper>
-        {tree && (
-          <Suspense fallback={<div>Component1 are loading please wait...</div>}>
-            <AssetTreeList
-              currentNode={tree}
-              renderRight={1000}
-              activeFilter={activeFilter}
-            />
-          </Suspense>
-        )}
-      </AssetTreeListWrapper>
+      {isLoading && (
+        <LoaderWrapper>
+          <Loader size={50} />
+        </LoaderWrapper>
+      )}
+      {!isLoading && (
+        <AssetTreeListWrapper>
+          {tree && (
+            <Suspense
+              fallback={<div>Component1 are loading please wait...</div>}
+            >
+              <AssetTreeList
+                currentNode={tree}
+                renderRight={1000}
+                activeFilter={activeFilter}
+              />
+            </Suspense>
+          )}
+        </AssetTreeListWrapper>
+      )}
     </AssetTreeWrapper>
   );
 };

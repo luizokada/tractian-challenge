@@ -54,3 +54,11 @@ export const AssetTreeListWrapper = styled.div`
   margin-top: 8px;
   height: max-content;
 `;
+
+export const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  flex: 1;
+`;

@@ -32,12 +32,6 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
   const [renderedChilds, setRenderedChilds] = React.useState<string[]>([]);
   const { selectedAsset, setSelectedAsset } = useContext(CompanieContext);
 
-  useEffect(() => {
-    return () => {
-      setRenderedChilds([]);
-    };
-  }, [activeFilter]);
-
   const shouldRenderBorder = useMemo(() => {
     return (
       currentNode.childrean &&
@@ -86,12 +80,6 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
           remainRenderRightVar =
             remainRenderRightVar - Tree.calcTreeSize(child);
         }
-        setRenderedChilds((prev) => {
-          if (prev.includes(child.id)) {
-            return prev;
-          }
-          return [...prev, child.id];
-        });
       }
       currentIndex += 1;
     }
@@ -101,7 +89,18 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
 
   const shoulRenderMoreButton = useMemo(() => {
     return childsToRender.length < currentNode.childrean?.length;
-  }, [remainRenderRight, childsToRender]);
+  }, [childsToRender, currentNode]);
+
+  useEffect(() => {
+    setRenderedChilds(childsToRender.map((child) => child.key as string));
+  }, [childsToRender]);
+
+  useEffect(() => {
+    return () => {
+      //hide most childs when filter changes to prevent lag
+      setRenderRight(1);
+    };
+  }, [activeFilter]);
 
   return (
     <AssetTreeItemContainer
@@ -198,4 +197,4 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
   );
 };
 
-export default React.memo(AssetTreeList);
+export default AssetTreeList;

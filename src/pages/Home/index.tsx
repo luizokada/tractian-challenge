@@ -1,6 +1,11 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Asset } from '../../api-types/asset';
+import { Location } from '../../api-types/location';
 import Header from '../../commom/Header';
+import { SensorEnum } from '../../const/sensor';
+import { StatusEnum } from '../../const/status';
 import { CompanieContext } from '../../context/Companie';
+import ThunderboltIcon from '../../icons/ThunderboltIcon';
 import WarningIcon from '../../icons/WarningIcon';
 import { FilterType } from '../../types/filter';
 import { Tree } from '../../utils/Tree';
@@ -14,11 +19,6 @@ import {
   HomeCompanieFilterInfo,
   HomeContainer,
 } from './styles';
-import { Asset } from '../../api-types/asset';
-import { Location } from '../../api-types/location';
-import { SensorEnum } from '../../const/sensor';
-import { StatusEnum } from '../../const/status';
-import ThunderboltIcon from '../../icons/ThunderboltIcon';
 
 function getFilteredAssets(assets: Asset[], filter: FilterType): Asset[] {
   return assets.filter((asset) => {
@@ -92,7 +92,7 @@ function filterTree(tree: Tree, whiteList: String[]): Tree | undefined {
 }
 
 const Home: React.FC = () => {
-  const { selectedCompany, companies, location, assets } =
+  const { selectedCompany, companies, locations, assets } =
     useContext(CompanieContext);
 
   const [activeFilter, setActiveFilter] = useState<FilterType>({
@@ -108,7 +108,7 @@ const Home: React.FC = () => {
   }, [selectedCompany, activeFilter]);
 
   const currentTree = useMemo(() => {
-    if (location && location.length && assets && assets.length) {
+    if (locations && locations.length && assets && assets.length) {
       const locationsDicst: {
         [key: string]: {
           data: Location | undefined;
@@ -119,7 +119,7 @@ const Home: React.FC = () => {
         };
       } = {};
 
-      location.forEach((loc) => {
+      locations.forEach((loc) => {
         locationsDicst[loc.id] = {
           data: loc,
           childrean: [],
@@ -139,7 +139,7 @@ const Home: React.FC = () => {
         }
       });
 
-      location.forEach((loc) => {
+      locations.forEach((loc) => {
         if (loc.parentId) {
           locationsDicst[loc.parentId].childrean.push({
             id: loc.id,
@@ -201,10 +201,10 @@ const Home: React.FC = () => {
       return tree;
     }
     return undefined;
-  }, [selectedCompany, location, assets]);
+  }, [selectedCompany, locations, assets]);
 
   const treeToRender = useMemo(() => {
-    if (!currentTree || !assets || !location) {
+    if (!currentTree || !assets || !locations) {
       return undefined;
     }
     if (!activeFilter.status && !activeFilter.type && !activeFilter.search) {
@@ -229,7 +229,7 @@ const Home: React.FC = () => {
     const locationWhiteList: String[] = [];
     if (activeFilter.search) {
       locationWhiteList.push(
-        ...getLocationsBySearch(location, activeFilter.search).map(
+        ...getLocationsBySearch(locations, activeFilter.search).map(
           (location) => location.id,
         ),
       );
@@ -246,7 +246,7 @@ const Home: React.FC = () => {
     }
     const tree = filterTree(currentTree, whiteListToFilter);
     return tree;
-  }, [currentTree, activeFilter, assets, location]);
+  }, [currentTree, activeFilter, assets, locations]);
 
   const selectedCompainieInfo = useMemo(() => {
     return companies?.find((companie) => companie.id === selectedCompany);

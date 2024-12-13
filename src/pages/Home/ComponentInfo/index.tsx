@@ -11,20 +11,26 @@ import {
   ComponentInfoWrapper,
   EmptyStateContainer,
   FirstLineContainer,
+  ImageInputContainer,
+  ImageWrapper,
   SecordLineContainer,
 } from './styles';
+import TrashIcon from '../../../icons/TrashIcon';
+import InboxIcon from '../../../icons/InboxIcon';
 
 const ComponentInfo: React.FC = () => {
   const ref = React.useRef<HTMLInputElement>(null);
   const { selectedAsset } = useContext(CompanieContext);
   const [imageFile, setImageFile] = React.useState<File | undefined>();
   const [image, setImage] = React.useState<string | undefined>();
+  const [error, setError] = React.useState<string | undefined>();
 
   const handleChangeInputImage = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.target.files || e.target.files.length === 0) {
         return;
       }
+      setError(undefined);
       const ImageFile = e.target.files[0];
 
       if (
@@ -33,6 +39,7 @@ const ComponentInfo: React.FC = () => {
         ImageFile.type !== 'image/jpg' &&
         ImageFile.type !== 'image/webp'
       ) {
+        setError('Formato de imagem inválido');
         return;
       }
 
@@ -44,7 +51,7 @@ const ComponentInfo: React.FC = () => {
         setImage(reader.result as string);
       };
       reader.onerror = () => {
-        //toastError({ title: 'Erro ao converter a Imagem!' });
+        setError('Erro ao carregar imagem');
       };
     },
 
@@ -79,17 +86,39 @@ const ComponentInfo: React.FC = () => {
           </ComponentInfoWrapper>
           <ComponentDetailInfoContainer>
             <FirstLineContainer>
-              <div
-                className="image-wrapper"
-                onClick={() => {
-                  if (!ref.current || imageFile) return;
-                  ref.current?.click();
-                }}
-              >
-                {!imageFile && <p>Adicionar imagem</p>}
-                {image && <img src={image} alt="Imagem do Ativo" />}
-                <input type="file" ref={ref} onInput={handleChangeInputImage} />
-              </div>
+              <ImageInputContainer>
+                <ImageWrapper
+                  onClick={() => {
+                    if (!ref.current || imageFile) return;
+                    ref.current?.click();
+                  }}
+                >
+                  {!!image && (
+                    <div
+                      className="trash-icon"
+                      onClick={() => {
+                        setImage(undefined);
+                        setImageFile(undefined);
+                      }}
+                    >
+                      <TrashIcon width={14} height={14} color="#171717" />
+                    </div>
+                  )}
+                  {!imageFile && (
+                    <>
+                      <InboxIcon />
+                      <p>Adicionar imagem</p>
+                    </>
+                  )}
+                  {image && <img src={image} alt="Imagem do Ativo" />}
+                  <input
+                    type="file"
+                    ref={ref}
+                    onInput={handleChangeInputImage}
+                  />
+                </ImageWrapper>
+                {error && <p>{error}</p>}
+              </ImageInputContainer>
               <div className="infos">
                 <div className="info-item">
                   <p>
