@@ -26,7 +26,6 @@ interface useFetchTypes<T> {
   header?: {
     [key: string]: string | number | boolean | undefined;
   };
-  APIversion?: string;
   isPublicCall?: boolean;
 }
 
@@ -38,7 +37,6 @@ export const useFetch = <T = any>({
   params = {},
   options = {},
   header = {},
-  APIversion,
 }: useFetchTypes<T>) => {
   const fetch = async ({ signal }: { signal?: GenericAbortSignal }) => {
     const { data } = await axiosClient.get(url, {
@@ -47,7 +45,6 @@ export const useFetch = <T = any>({
 
       headers: {
         ...header,
-        'API-Version': APIversion ?? 'v1',
       },
     });
 

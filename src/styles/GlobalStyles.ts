@@ -9,25 +9,23 @@ export default createGlobalStyle`
     box-sizing: border-box;
   }
 
+
   main{
     display: flex;
     max-width: 100%;
     min-height: 100vh;
+    min-width: 100vw;
+    overflow: hidden;
+    max-height: 100vh;
     align-items: center;
     flex-direction: column;
-    padding-top: 120px;
-    padding-left: 288px;
-    padding-right: 48px;
-    overflow: hidden;
+    background-color: ${({ theme }) => theme.Colors.Gray._500};
 
-    @media (max-width: 768px) {
-      padding: 16px;
-      padding-top: 80px;
-  }
+
   }
 
   body{
-    background-color: ${({ theme }) => theme.Colors.Gray._100};
+    margin: 0;
   }
 
 
