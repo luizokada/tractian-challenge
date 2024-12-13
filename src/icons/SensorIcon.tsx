@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const SensorIcon: React.FC<IconProps> = ({
   width = '20',
   height = '20',

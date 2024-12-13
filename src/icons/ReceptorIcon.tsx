@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const ReceptorIcon: React.FC<IconProps> = ({
   width = '21',
   height = '20',

@@ -1,12 +1,12 @@
-import { Asset, AssetFromApi } from '../api-types/asset';
-import { LocationFromApi } from '../api-types/location';
+import { Asset } from '../api-types/asset';
+import { Location } from '../api-types/location';
 
 interface TreeProps {
   id: string;
   name: string;
   parentId?: string;
   level: number;
-  children: Tree[];
+  childrean: Tree[];
   parent?: Tree;
   data?: Asset;
 }
@@ -14,7 +14,7 @@ export class Tree {
   private _id: string;
   private _parenteId?: string;
   private _name: string;
-  private _children: Tree[];
+  private _childrean: Tree[];
   private _parent?: Tree;
   private _level: number;
   private _data?: Asset;
@@ -23,93 +23,127 @@ export class Tree {
     this._id = props.id;
     this._parenteId = props.parentId;
     this._name = props.name;
-    this._children = props.children;
+    this._childrean = props.childrean;
     this._parent = props.parent;
     this._level = props.level;
     this._data = props.data;
   }
 
   static initTree(
-    LocationFromApi: LocationFromApi,
-    assets: AssetFromApi,
+    LocationFromApi: {
+      [key: string]: {
+        data: Location | undefined;
+        childrean: {
+          id: string;
+          type: string;
+        }[];
+      };
+    },
+    assets: {
+      [key: string]: {
+        data: Asset | undefined;
+        childrean: string[];
+      };
+    },
     treeProps: TreeProps,
-    type?: string,
   ): Tree {
     const tree = new Tree(treeProps);
-    tree.children = tree.initChildrean(
+    tree.childrean = tree.initChildrean(
       LocationFromApi,
       assets,
       tree._id,
       tree,
-      type,
     );
     return tree;
   }
 
   private initChildrean(
-    LocationFromApi: LocationFromApi,
-    assets: AssetFromApi,
+    LocationFromApi: {
+      [key: string]: {
+        data: Location | undefined;
+        childrean: {
+          id: string;
+          type: string;
+        }[];
+      };
+    },
+    assets: {
+      [key: string]: {
+        data: Asset | undefined;
+        childrean: string[];
+      };
+    },
     currentId: string | null,
     parent: Tree,
-    type?: string,
   ) {
-    const parentToSearch = currentId === 'root' ? null : currentId;
-    const locationChildren = LocationFromApi.filter(
-      (location) => location.parentId === parentToSearch,
-    );
-    const assetChildren = assets.filter((asset) => {
-      if (type === 'location') {
-        return asset.locationId === parentToSearch;
-      }
-      if (type === 'asset') {
-        return asset.parentId === parentToSearch;
-      }
-      if (!parentToSearch) {
-        return asset.locationId === null && asset.parentId === null;
-      }
-      return false;
-    });
+    if (!currentId) return [];
+    const parentToSearch = currentId;
 
-    if (!locationChildren.length && !assetChildren.length) {
-      return [];
+    let locationChild: { id: string; type: string }[] = [];
+
+    let assetChild: string[] = [];
+
+    if (
+      LocationFromApi[parentToSearch] &&
+      LocationFromApi[parentToSearch].childrean
+    ) {
+      locationChild = LocationFromApi[parentToSearch].childrean;
     }
 
-    const locationChieldren = locationChildren.map((location) => {
-      const locationNode = Tree.initTree(
+    if (assets[parentToSearch] && assets[parentToSearch].childrean) {
+      assetChild = assets[parentToSearch].childrean;
+    }
+
+    const locationTree: Tree[] = [];
+
+    locationChild.forEach((child) => {
+      const location =
+        child.type === 'location'
+          ? LocationFromApi[child.id]
+          : assets[child.id];
+      if (!location) return;
+      const tree = new Tree({
+        id: child.id,
+        name: location?.data?.name || '',
+        parentId: parentToSearch,
+        level: parent.level + 1,
+        childrean: [],
+        parent,
+        data: child.type === 'location' ? undefined : assets[child.id].data,
+      });
+      tree.childrean = this.initChildrean(
         LocationFromApi,
         assets,
-        {
-          id: location.id,
-          name: location.name,
-          parentId: location.parentId,
-          level: parent.level + 1,
-          children: [],
-          parent: parent,
-        },
-        'location',
+        child.id,
+        tree,
       );
-      return locationNode;
+      locationTree.push(tree);
     });
 
-    const assetChieldren = assetChildren.map((asset) => {
-      const assetNode = Tree.initTree(
-        LocationFromApi,
-        assets,
-        {
-          id: asset.id,
-          name: asset.name,
-          parentId: asset.parentId,
-          level: parent.level + 1,
-          children: [],
-          parent: parent,
-        },
-        'asset',
-      );
-      assetNode.data = asset;
-      return assetNode;
+    const assetChildrean = assetChild.map((child) => {
+      const asset = assets[child];
+      const tree = new Tree({
+        id: child,
+        name: asset.data?.name || '',
+        parentId: parentToSearch,
+        level: parent.level + 1,
+        childrean: [],
+        parent,
+        data: asset.data,
+      });
+      tree.childrean = this.initChildrean(LocationFromApi, assets, child, tree);
+      return tree;
     });
 
-    return [...locationChieldren, ...assetChieldren];
+    return [...locationTree, ...assetChildrean];
+  }
+
+  static calcTreeSize(tree: Tree): number {
+    let size = 1;
+    tree.childrean.forEach((child) => {
+      size += this.calcTreeSize(child);
+    });
+    return size;
   }
   get id() {
     return this._id;
@@ -120,8 +154,8 @@ export class Tree {
   get name() {
     return this._name;
   }
-  get children() {
-    return this._children;
+  get childrean() {
+    return this._childrean;
   }
   get parent() {
     return this._parent;
@@ -137,7 +171,7 @@ export class Tree {
     this._data = data;
   }
 
-  set children(children: Tree[]) {
-    this._children = children;
+  set childrean(childrean: Tree[]) {
+    this._childrean = childrean;
   }
 }

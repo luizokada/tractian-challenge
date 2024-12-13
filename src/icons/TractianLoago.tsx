@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const TractianLogoIcon: React.FC<IconProps> = ({
   width = '103',
   height = '14',

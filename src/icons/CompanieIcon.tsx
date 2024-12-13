@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const CompanieIcon: React.FC<IconProps> = ({
   color = '#fff',
   width = '14',

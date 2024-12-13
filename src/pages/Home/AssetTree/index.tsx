@@ -1,30 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useEffect, useRef } from 'react';
+import SearchIcon from '../../../icons/SearchIcon';
+import { FilterType } from '../../../types/filter';
 import { Tree } from '../../../utils/Tree';
 import {
   AssetTreeListWrapper,
   AssetTreeWrapper,
   SearchInputContainer,
 } from './styles';
-import SearchIcon from '../../../icons/SearchIcon';
-import { FilterType } from '../../../types/filter';
-import AssetTreeList from './AssetTreeList';
-import { Asset } from '../../../api-types/asset';
 
-// import { Container } from './styles';
+const AssetTreeList = lazy(() => import('./AssetTreeList'));
 
 interface AssetTreeProps {
   tree?: Tree;
   setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
-  setSelectedAsset: React.Dispatch<React.SetStateAction<Asset | undefined>>;
-  seletedAsset?: Asset;
 }
 
-const AssetTree: React.FC<AssetTreeProps> = ({
-  setFilter,
-  tree,
-  setSelectedAsset,
-  seletedAsset,
-}) => {
+const AssetTree: React.FC<AssetTreeProps> = ({ setFilter, tree }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -64,11 +55,9 @@ const AssetTree: React.FC<AssetTreeProps> = ({
       </SearchInputContainer>
       <AssetTreeListWrapper>
         {tree && (
-          <AssetTreeList
-            currentNode={tree}
-            setSelectedAsset={setSelectedAsset}
-            selectedAsset={seletedAsset}
-          />
+          <Suspense fallback={<div>Component1 are loading please wait...</div>}>
+            <AssetTreeList currentNode={tree} renderRight={1000} />
+          </Suspense>
         )}
       </AssetTreeListWrapper>
     </AssetTreeWrapper>

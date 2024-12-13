@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const BoltIcon: React.FC<IconProps> = ({ color = '#000' }) => {
   return (
     <svg

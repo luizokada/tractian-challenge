@@ -20,8 +20,6 @@ import { SensorEnum } from '../../const/sensor';
 import { StatusEnum } from '../../const/status';
 import ThunderboltIcon from '../../icons/ThunderboltIcon';
 
-// import { Container } from './styles';
-
 function getAssetsBySensorType(assets: Asset[], sensorType: string): Asset[] {
   return assets.filter((asset) => asset.sensorType === sensorType);
 }
@@ -72,13 +70,13 @@ function filterTree(tree: Tree, whiteList: String[]): Tree | undefined {
       level: tree.level,
       parent: tree.parent,
       data: tree.asset,
-      children: [],
+      childrean: [],
     });
   }
-  const children = tree.children
+  const childrean = tree.childrean
     .map((child) => filterTree(child, whiteList))
     .filter((child) => !!child);
-  if (children.length === 0) {
+  if (childrean.length === 0) {
     return;
   }
 
@@ -89,7 +87,7 @@ function filterTree(tree: Tree, whiteList: String[]): Tree | undefined {
     level: tree.level,
     parent: tree.parent,
     data: tree.asset,
-    children,
+    childrean,
   });
 }
 
@@ -103,7 +101,7 @@ const Home: React.FC = () => {
     search: undefined,
   });
 
-  const [selectedAsset, setSelectedAsset] = useState<Asset | undefined>();
+  const { setSelectedAsset } = useContext(CompanieContext);
 
   useEffect(() => {
     setSelectedAsset(undefined);
@@ -111,14 +109,95 @@ const Home: React.FC = () => {
 
   const currentTree = useMemo(() => {
     if (location && location.length && assets && assets.length) {
-      const tree = Tree.initTree(location, assets, {
+      const locationsDicst: {
+        [key: string]: {
+          data: Location | undefined;
+          childrean: {
+            id: string;
+            type: string;
+          }[];
+        };
+      } = {};
+
+      location.forEach((loc) => {
+        locationsDicst[loc.id] = {
+          data: loc,
+          childrean: [],
+        };
+        if (!loc.parentId && !locationsDicst['root']) {
+          locationsDicst['root'] = {
+            data: undefined,
+            childrean: [{ id: loc.id, type: 'location' }],
+          };
+          return;
+        }
+        if (!loc.parentId) {
+          locationsDicst['root'].childrean.push({
+            id: loc.id,
+            type: 'location',
+          });
+        }
+      });
+
+      location.forEach((loc) => {
+        if (loc.parentId) {
+          locationsDicst[loc.parentId].childrean.push({
+            id: loc.id,
+            type: 'location',
+          });
+        }
+      });
+
+      const assetsDict: {
+        [key: string]: {
+          data: Asset | undefined;
+          childrean: string[];
+        };
+      } = {};
+
+      assets.forEach((asset) => {
+        assetsDict[asset.id] = {
+          data: asset,
+          childrean: [],
+        };
+
+        const isRoot = !asset.locationId && !asset.parentId;
+
+        if (isRoot && !assetsDict['root']) {
+          assetsDict['root'] = {
+            data: undefined,
+            childrean: [asset.id],
+          };
+          return;
+        }
+        if (isRoot && assetsDict['root']) {
+          assetsDict['root'].childrean.push(asset.id);
+          return;
+        }
+      });
+
+      assets.forEach((asset) => {
+        if (asset.parentId) {
+          assetsDict[asset.parentId].childrean.push(asset.id);
+        }
+
+        if (asset.locationId) {
+          locationsDicst[asset.locationId].childrean.push({
+            id: asset.id,
+            type: 'asset',
+          });
+        }
+      });
+
+      const tree = Tree.initTree(locationsDicst, assetsDict, {
         id: 'root',
         name: 'root',
         parentId: undefined,
         level: 0,
-        children: [],
+        childrean: [],
         parent: undefined,
       });
+
       return tree;
     }
     return undefined;
@@ -224,13 +303,8 @@ const Home: React.FC = () => {
           </AssetTreeFilterController>
         </HomeCompanieFilterInfo>
         <AssetInfosWrapper>
-          <AssetTree
-            tree={treeToRender}
-            setFilter={setActiveFilter}
-            setSelectedAsset={setSelectedAsset}
-            seletedAsset={selectedAsset}
-          />
-          <ComponentInfo selectedAsset={selectedAsset} />
+          <AssetTree tree={treeToRender} setFilter={setActiveFilter} />
+          <ComponentInfo />
         </AssetInfosWrapper>
       </HomeContainer>
     </main>

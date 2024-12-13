@@ -8,20 +8,23 @@ import TractianLogoIcon from '../../icons/TractianLoago';
 import { CompanieContext } from '../../context/Companie';
 import CompanieIcon from '../../icons/CompanieIcon';
 
-// import { Container } from './styles';
-
 const Header: React.FC = () => {
-  const { companies, selectedCompany,setSelectedCompany } = useContext(CompanieContext);
+  const { companies, selectedCompany, setSelectedCompany } =
+    useContext(CompanieContext);
   return (
     <HeaderContainer>
       <TractianLogoIcon />
       <CompanieSelectionContainer>
         {companies?.map((companie) => (
-          <CompanieOption key={companie.id} $isSelected={companie.id === selectedCompany} onClick={() => {
-            if(selectedCompany !== companie.id){
-              setSelectedCompany(companie.id);
-            }
-          }}>
+          <CompanieOption
+            key={companie.id}
+            $isSelected={companie.id === selectedCompany}
+            onClick={() => {
+              if (selectedCompany !== companie.id) {
+                setSelectedCompany(companie.id);
+              }
+            }}
+          >
             <CompanieIcon />
             <p>{companie.name}</p>
           </CompanieOption>

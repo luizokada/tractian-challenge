@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const LocationIcon: React.FC<IconProps> = ({
   width = '22',
   height = '22',

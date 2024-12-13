@@ -4,8 +4,6 @@ import { StatusColor, StatusEnum } from '../../const/status';
 import BoltIcon from '../../icons/BoltIcon';
 import { StatusIndicatorContainer } from './styles';
 
-// import { Container } from './styles';
-
 interface StatusIndicatorProps {
   status: StatusEnum;
   size?: number;

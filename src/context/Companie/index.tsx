@@ -2,13 +2,11 @@ import React, { createContext, useEffect, useState } from 'react';
 
 import { useQueryClient } from 'react-query';
 
-import { AssetFromApi } from '../../api-types/asset';
+import { Asset, AssetFromApi } from '../../api-types/asset';
 import { CompaniesFromApi } from '../../api-types/companies';
 import { LocationFromApi } from '../../api-types/location';
 import { useFetch } from '../../hooks/useFetch';
 import { TractionApi } from '../../services';
-
-// import { Container } from './styles';
 
 type CompanieContextType = {
   companies: CompaniesFromApi | undefined;
@@ -17,6 +15,8 @@ type CompanieContextType = {
   setSelectedCompany: React.Dispatch<React.SetStateAction<string>>;
   assets: AssetFromApi | undefined;
   location: LocationFromApi | undefined;
+  selectedAsset: Asset | undefined;
+  setSelectedAsset: React.Dispatch<React.SetStateAction<Asset | undefined>>;
 };
 
 export const CompanieContext = createContext<CompanieContextType>({
@@ -24,6 +24,8 @@ export const CompanieContext = createContext<CompanieContextType>({
   assets: undefined,
   location: undefined,
 
+  selectedAsset: undefined,
+  setSelectedAsset: () => {},
   selectedCompany: '',
   setSelectedCompany: () => {},
 });
@@ -35,6 +37,7 @@ const CompanieProvider: React.FC<CompanieProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
 
   const [selectedCompany, setSelectedCompany] = useState<string>('');
+  const [selectedAsset, setSelectedAsset] = useState<Asset>();
 
   const { data: companies } = useFetch<CompaniesFromApi>({
     fetchName: 'getCompanies',
@@ -44,7 +47,6 @@ const CompanieProvider: React.FC<CompanieProviderProps> = ({ children }) => {
       retry: false,
     },
   });
-
 
   const { data: assets } = useFetch<AssetFromApi>({
     fetchName: ['getAssets', selectedCompany],
@@ -65,18 +67,16 @@ const CompanieProvider: React.FC<CompanieProviderProps> = ({ children }) => {
     },
   });
 
-
   useEffect(() => {
     queryClient.invalidateQueries('getAssets');
     queryClient.invalidateQueries('getLocation');
   }, [selectedCompany]);
 
   useEffect(() => {
-    if (companies && companies.length &&!selectedCompany) {
+    if (companies && companies.length && !selectedCompany) {
       setSelectedCompany(companies[0].id);
     }
   }, [companies]);
-
 
   return (
     <CompanieContext.Provider
@@ -86,6 +86,8 @@ const CompanieProvider: React.FC<CompanieProviderProps> = ({ children }) => {
         setSelectedCompany,
         assets,
         location,
+        selectedAsset,
+        setSelectedAsset,
       }}
     >
       {children}

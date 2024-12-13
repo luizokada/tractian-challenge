@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const SearchIcon: React.FC<IconProps> = ({
   width = 14,
   height = 14,

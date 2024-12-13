@@ -1,8 +1,6 @@
 import React from 'react';
 import { IconProps } from './type/IcontProps';
 
-// import { Container } from './styles';
-
 const WarningIcon: React.FC<IconProps> = ({
   width = '16',
   height = '16',

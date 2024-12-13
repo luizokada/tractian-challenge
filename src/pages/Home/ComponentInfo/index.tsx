@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
-import { Asset } from '../../../api-types/asset';
+import React, { useCallback, useContext, useEffect } from 'react';
 import StatusIndicator from '../../../commom/StatusIndicator';
 import { SensorDict } from '../../../const/sensor';
 import { StatusDict } from '../../../const/status';
+import { CompanieContext } from '../../../context/Companie';
 import ReceptorIcon from '../../../icons/ReceptorIcon';
 import SensorIcon from '../../../icons/SensorIcon';
 import {
@@ -14,14 +14,9 @@ import {
   SecordLineContainer,
 } from './styles';
 
-// import { Container } from './styles';
-
-interface ComponentInfoProps {
-  selectedAsset: Asset | undefined;
-}
-
-const ComponentInfo: React.FC<ComponentInfoProps> = ({ selectedAsset }) => {
+const ComponentInfo: React.FC = () => {
   const ref = React.useRef<HTMLInputElement>(null);
+  const { selectedAsset } = useContext(CompanieContext);
   const [imageFile, setImageFile] = React.useState<File | undefined>();
   const [image, setImage] = React.useState<string | undefined>();
 
