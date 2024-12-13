@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { Asset } from '../../../../api-types/asset';
+import StatusIndicator from '../../../../commom/StatusIndicator';
+import { useCollapse } from '../../../../hooks/useCollapse';
 import AssetIcon from '../../../../icons/AssetIcon';
 import ComponentIcon from '../../../../icons/ComponentIcon';
 import LocationIcon from '../../../../icons/LocationIcon';
 import { Tree } from '../../../../utils/Tree';
 import { AssetTreeItemContainer, ChildreanWrapper } from './styles';
-import { useCollapse } from '../../../../hooks/useCollapse';
-import { Asset } from '../../../../api-types/asset';
-import StatusIndicator from '../../../../commom/StatusIndicator';
 
 // import { Container } from './styles';
 
