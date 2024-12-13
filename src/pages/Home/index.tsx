@@ -20,12 +20,12 @@ import { SensorEnum } from '../../const/sensor';
 import { StatusEnum } from '../../const/status';
 import ThunderboltIcon from '../../icons/ThunderboltIcon';
 
-function getAssetsBySensorType(assets: Asset[], sensorType: string): Asset[] {
-  return assets.filter((asset) => asset.sensorType === sensorType);
-}
-
-function getAssetsByStatus(assets: Asset[], status: string): Asset[] {
-  return assets.filter((asset) => asset.status === status);
+function getFilteredAssets(assets: Asset[], filter: FilterType): Asset[] {
+  return assets.filter((asset) => {
+    const statusFilter = filter.status ? asset.status === filter.status : true;
+    const typeFilter = filter.type ? asset.sensorType === filter.type : true;
+    return statusFilter && typeFilter;
+  });
 }
 
 function getAssetsBySearch(assets: Asset[], search: string): Asset[] {
@@ -70,7 +70,7 @@ function filterTree(tree: Tree, whiteList: String[]): Tree | undefined {
       level: tree.level,
       parent: tree.parent,
       data: tree.asset,
-      childrean: [],
+      childrean: !tree.asset ? tree.childrean : [],
     });
   }
   const childrean = tree.childrean
@@ -212,20 +212,12 @@ const Home: React.FC = () => {
     }
 
     const assetWhiteList: String[] = [];
-    if (activeFilter.type) {
+    if (activeFilter.type || activeFilter.status) {
       assetWhiteList.push(
-        ...getAssetsBySensorType(assets, activeFilter.type).map(
-          (asset) => asset.id,
-        ),
+        ...getFilteredAssets(assets, activeFilter).map((asset) => asset.id),
       );
     }
-    if (activeFilter.status) {
-      assetWhiteList.push(
-        ...getAssetsByStatus(assets, activeFilter.status).map(
-          (asset) => asset.id,
-        ),
-      );
-    }
+
     if (activeFilter.search) {
       assetWhiteList.push(
         ...getAssetsBySearch(assets, activeFilter.search).map(
@@ -259,6 +251,12 @@ const Home: React.FC = () => {
   const selectedCompainieInfo = useMemo(() => {
     return companies?.find((companie) => companie.id === selectedCompany);
   }, [selectedCompany, companies]);
+
+  const shouldRendeClearFilters = useMemo(() => {
+    return (
+      !!activeFilter.status || !!activeFilter.type || !!activeFilter.search
+    );
+  }, [activeFilter]);
   return (
     <main>
       <Header />
@@ -270,6 +268,22 @@ const Home: React.FC = () => {
             </h1>
           </CompanieInfo>
           <AssetTreeFilterController>
+            {shouldRendeClearFilters && (
+              <AssetTreeFilterButton
+                $isActive={false}
+                onClick={() =>
+                  setActiveFilter(() => {
+                    return {
+                      search: undefined,
+                      status: undefined,
+                      type: undefined,
+                    };
+                  })
+                }
+              >
+                <p>Limpar Filtros</p>
+              </AssetTreeFilterButton>
+            )}
             <AssetTreeFilterButton
               $isActive={!!activeFilter.type}
               onClick={() =>
@@ -303,7 +317,11 @@ const Home: React.FC = () => {
           </AssetTreeFilterController>
         </HomeCompanieFilterInfo>
         <AssetInfosWrapper>
-          <AssetTree tree={treeToRender} setFilter={setActiveFilter} />
+          <AssetTree
+            tree={treeToRender}
+            setFilter={setActiveFilter}
+            activeFilter={activeFilter}
+          />
           <ComponentInfo />
         </AssetInfosWrapper>
       </HomeContainer>

@@ -13,9 +13,14 @@ const AssetTreeList = lazy(() => import('./AssetTreeList'));
 interface AssetTreeProps {
   tree?: Tree;
   setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
+  activeFilter: FilterType;
 }
 
-const AssetTree: React.FC<AssetTreeProps> = ({ setFilter, tree }) => {
+const AssetTree: React.FC<AssetTreeProps> = ({
+  setFilter,
+  tree,
+  activeFilter,
+}) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -25,6 +30,10 @@ const AssetTree: React.FC<AssetTreeProps> = ({ setFilter, tree }) => {
     }, 300);
     return () => clearTimeout(timeout);
   }, [searchTerm, setFilter]);
+
+  useEffect(() => {
+    setSearchTerm(activeFilter.search || '');
+  }, [activeFilter.search]);
 
   return (
     <AssetTreeWrapper>
@@ -56,7 +65,11 @@ const AssetTree: React.FC<AssetTreeProps> = ({ setFilter, tree }) => {
       <AssetTreeListWrapper>
         {tree && (
           <Suspense fallback={<div>Component1 are loading please wait...</div>}>
-            <AssetTreeList currentNode={tree} renderRight={1000} />
+            <AssetTreeList
+              currentNode={tree}
+              renderRight={1000}
+              activeFilter={activeFilter}
+            />
           </Suspense>
         )}
       </AssetTreeListWrapper>

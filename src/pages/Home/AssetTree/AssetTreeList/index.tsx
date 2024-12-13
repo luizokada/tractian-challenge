@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import StatusIndicator from '../../../../commom/StatusIndicator';
 import { CompanieContext } from '../../../../context/Companie';
 import { useCollapse } from '../../../../hooks/useCollapse';
@@ -13,21 +13,30 @@ import {
   ExpandButton,
 } from './styles';
 import ChevronIcon from '../../../../icons/ChevronIcon';
+import { FilterType } from '../../../../types/filter';
 
 interface AssetTreeListProps {
   currentNode: Tree;
   renderRight: number;
+  activeFilter: FilterType;
 }
 
 const AssetTreeList: React.FC<AssetTreeListProps> = ({
   currentNode,
   renderRight,
+  activeFilter,
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(true);
   const { ref, height } = useCollapse(isExpanded, [currentNode]);
   const [remainRenderRight, setRenderRight] = React.useState(renderRight);
   const [renderedChilds, setRenderedChilds] = React.useState<string[]>([]);
   const { selectedAsset, setSelectedAsset } = useContext(CompanieContext);
+
+  useEffect(() => {
+    return () => {
+      setRenderedChilds([]);
+    };
+  }, [activeFilter]);
 
   const shouldRenderBorder = useMemo(() => {
     return (
@@ -65,6 +74,7 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
           <AssetTreeList
             currentNode={child}
             key={child.id}
+            activeFilter={activeFilter}
             renderRight={
               remainRenderRightVar - Tree.calcTreeSize(child) > 0
                 ? remainRenderRightVar - Tree.calcTreeSize(child)
