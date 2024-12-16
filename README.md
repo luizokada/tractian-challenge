@@ -23,12 +23,13 @@ The implemneted features are:
       
     3. **Component Vizualization**
 
-  To be implemented:
-    1. **Collapse and Expand All Nodes**  
-       - Allow users to collapse or expand all child nodes at once.
+To be implemented:
+1. **Collapse and Expand All Nodes**  
+   - Allow users to collapse or expand all child nodes at once.
     
-    2. **Improved Tree Pagination**  
-       - Currently, to prevent lag when rendering large datasets, a pagination system has been
-         implemented for tree rendering. A future improvement would be to render the entire tree seamlessly without requiring user interaction, while maintaining optimal performance.
+2. **Improved Tree Pagination**  
+   - Currently, to prevent lag when rendering large datasets, a pagination system has been
+     implemented for tree rendering. A future improvement would be to render the entire tree
+     seamlessly without requiring user interaction, while maintaining optimal performance.
 
         
