@@ -20,7 +20,6 @@ The implemneted features are:
         **Critical Sensor Status**
         
         - Integrate a filter to identify assets with critical sensor status.
-    - When the filters are applied, the asset parents **can't** be hidden. The user must know the entire asset path. The items that are not related to the asset path, must be hidden
       
     3. **Component Vizualization**
 
