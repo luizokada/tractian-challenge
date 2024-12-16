@@ -30,7 +30,6 @@ const AssetTree: React.FC<AssetTreeProps> = ({
   const isFeatching = useIsFetchingQueries(['getAssets', 'getLocations']);
 
   const isLoading = useMemo(() => {
-    console.log('isFeatching', isFeatching);
     return !!isFeatching;
   }, [isFeatching]);
 

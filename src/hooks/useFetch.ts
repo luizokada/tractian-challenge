@@ -51,7 +51,6 @@ export const useFetch = <T = any>({
     const { data } = await axiosClient.get(url, {
       signal,
       params,
-
       headers: {
         ...header,
       },

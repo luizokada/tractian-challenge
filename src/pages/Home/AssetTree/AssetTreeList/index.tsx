@@ -3,8 +3,10 @@ import StatusIndicator from '../../../../commom/StatusIndicator';
 import { CompanieContext } from '../../../../context/Companie';
 import { useCollapse } from '../../../../hooks/useCollapse';
 import AssetIcon from '../../../../icons/AssetIcon';
+import ChevronIcon from '../../../../icons/ChevronIcon';
 import ComponentIcon from '../../../../icons/ComponentIcon';
 import LocationIcon from '../../../../icons/LocationIcon';
+import { FilterType } from '../../../../types/filter';
 import { Tree } from '../../../../utils/Tree';
 import {
   AssetTreeItemContainer,
@@ -12,8 +14,6 @@ import {
   ChildreanWrapper,
   ExpandButton,
 } from './styles';
-import ChevronIcon from '../../../../icons/ChevronIcon';
-import { FilterType } from '../../../../types/filter';
 
 interface AssetTreeListProps {
   currentNode: Tree;
@@ -28,9 +28,18 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(true);
   const { ref, height } = useCollapse(isExpanded, [currentNode]);
-  const [remainRenderRight, setRenderRight] = React.useState(renderRight);
+  const [remainRenderRight, setRemainRenderRight] = React.useState(renderRight);
   const [renderedChilds, setRenderedChilds] = React.useState<string[]>([]);
   const { selectedAsset, setSelectedAsset } = useContext(CompanieContext);
+
+  useMemo(() => {
+    if (currentNode.id === 'root' && Tree.calcTreeSize(currentNode) < 1000) {
+      setRemainRenderRight(renderRight);
+      return;
+    }
+    setRemainRenderRight(1);
+    setRenderedChilds([]);
+  }, [activeFilter]);
 
   const shouldRenderBorder = useMemo(() => {
     return (
@@ -85,23 +94,20 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
     }
 
     return nodesToRender;
-  }, [currentNode, remainRenderRight]);
+  }, [currentNode.childrean, remainRenderRight]);
 
   const shoulRenderMoreButton = useMemo(() => {
     return childsToRender.length < currentNode.childrean?.length;
-  }, [childsToRender, currentNode]);
+  }, [childsToRender, currentNode.childrean]);
 
   useEffect(() => {
     setRenderedChilds(childsToRender.map((child) => child.key as string));
   }, [childsToRender]);
 
+  //rerender when renderRight changes
   useEffect(() => {
-    return () => {
-      //hide most childs when filter changes to prevent lag
-      setRenderRight(1);
-    };
-  }, [activeFilter]);
-
+    setRemainRenderRight(renderRight);
+  }, [renderRight]);
   return (
     <AssetTreeItemContainer
       $shouldREnderBorder={shouldRenderBorder}
@@ -185,7 +191,7 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
               marginLeft: `${currentNode.level * 8}px`,
             }}
             onClick={() => {
-              setRenderRight((prev) => prev + 1000);
+              setRemainRenderRight((prev) => prev + 1000);
             }}
           >
             <ChevronIcon />
@@ -197,4 +203,4 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
   );
 };
 
-export default AssetTreeList;
+export default React.memo(AssetTreeList);

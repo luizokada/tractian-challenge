@@ -143,6 +143,7 @@ export class Tree {
     tree.childrean.forEach((child) => {
       size += this.calcTreeSize(child);
     });
+
     return size;
   }
   get id() {
