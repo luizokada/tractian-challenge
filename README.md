@@ -1,6 +1,6 @@
 # Tractian chalenge
 
-This project renders a asset tree, consultint the [Tractian Api](fake-api.tractian.com) 
+This project renders a asset tree, consulting the [Tractian Api](fake-api.tractian.com) 
 
 The implemneted features are:
 - A visual Tree representation of the company's asset hierarchy.
@@ -21,5 +21,15 @@ The implemneted features are:
         
         - Integrate a filter to identify assets with critical sensor status.
     - When the filters are applied, the asset parents **can't** be hidden. The user must know the entire asset path. The items that are not related to the asset path, must be hidden
+      
     3. **Component Vizualization**
+
+  To be implemented:
+    1. **Collapse and Expand All Nodes**  
+       - Allow users to collapse or expand all child nodes at once.
+    
+    2. **Improved Tree Pagination**  
+       - Currently, to prevent lag when rendering large datasets, a pagination system has been
+         implemented for tree rendering. A future improvement would be to render the entire tree seamlessly without requiring user interaction, while maintaining optimal performance.
+
         
