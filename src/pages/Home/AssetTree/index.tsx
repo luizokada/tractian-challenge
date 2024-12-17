@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
+import Loader from '../../../commom/Loader';
 import SearchIcon from '../../../icons/SearchIcon';
 import { FilterType } from '../../../types/filter';
 import { Tree } from '../../../utils/Tree';
@@ -9,8 +10,6 @@ import {
   NotFoundComponent,
   SearchInputContainer,
 } from './styles';
-import { useIsFetchingQueries } from '../../../hooks/useIsFetchingQueries';
-import Loader from '../../../commom/Loader';
 
 const AssetTreeList = lazy(() => import('./AssetTreeList'));
 
@@ -27,17 +26,12 @@ const AssetTree: React.FC<AssetTreeProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const isFeatching = useIsFetchingQueries(['getAssets', 'getLocations']);
-
-  const isLoading = useMemo(() => {
-    return !!isFeatching;
-  }, [isFeatching]);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       setFilter((prev) => ({ ...prev, search: searchTerm }));
-    }, 300);
+    }, 100);
     return () => clearTimeout(timeout);
   }, [searchTerm, setFilter]);
 
@@ -50,6 +44,17 @@ const AssetTree: React.FC<AssetTreeProps> = ({
       !!activeFilter.status || !!activeFilter.type || !!activeFilter.search
     );
   }, [activeFilter]);
+  useEffect(() => {
+    setIsLoading(true);
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [isSomeFitlerActive, tree?.childrean]);
+
+  const renderRight = useMemo(() => {
+    return isSomeFitlerActive ? 1000 : 1001;
+  }, [isSomeFitlerActive]);
 
   return (
     <AssetTreeWrapper>
@@ -96,7 +101,7 @@ const AssetTree: React.FC<AssetTreeProps> = ({
             >
               <AssetTreeList
                 currentNode={tree}
-                renderRight={1000}
+                renderRight={renderRight}
                 activeFilter={activeFilter}
               />
             </Suspense>

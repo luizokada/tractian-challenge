@@ -19,24 +19,21 @@ interface AssetTreeListProps {
   currentNode: Tree;
   renderRight: number;
   activeFilter: FilterType;
+  preRendered?: string[];
 }
 
 const AssetTreeList: React.FC<AssetTreeListProps> = ({
   currentNode,
   renderRight,
   activeFilter,
+  preRendered,
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(true);
   const { ref, height } = useCollapse(isExpanded, [currentNode]);
+  const rederedChilds = React.useRef<string[]>(preRendered || []);
   const [remainRenderRight, setRemainRenderRight] = React.useState(renderRight);
-  const [renderedChilds, setRenderedChilds] = React.useState<string[]>([]);
+
   const { selectedAsset, setSelectedAsset } = useContext(CompanieContext);
-  useMemo(() => {
-    if (currentNode.id === 'root' && Tree.calcTreeSize(currentNode) < 1000) {
-      return;
-    }
-    setRemainRenderRight(1);
-  }, [activeFilter]);
 
   const shouldRenderBorder = useMemo(() => {
     return (
@@ -59,7 +56,7 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
       return [];
     }
     let remainRenderRightVar = remainRenderRight;
-
+    const renderedChilds = rederedChilds.current;
     const nodesToRender = [];
     let currentIndex = 0;
 
@@ -91,15 +88,15 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
     }
 
     return nodesToRender;
-  }, [currentNode.childrean, remainRenderRight]);
+  }, [remainRenderRight]);
 
   const shoulRenderMoreButton = useMemo(() => {
     return childsToRender.length < currentNode.childrean?.length;
   }, [childsToRender, currentNode.childrean]);
 
   useEffect(() => {
-    setRenderedChilds(childsToRender.map((child) => child.key as string));
-  }, [childsToRender]);
+    rederedChilds.current = childsToRender.map((child) => child.key as string);
+  }, [childsToRender, remainRenderRight, currentNode.childrean, renderRight]);
 
   //rerender when renderRight changes
   useEffect(() => {

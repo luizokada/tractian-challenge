@@ -8,7 +8,7 @@ interface TreeProps {
   level: number;
   childrean: Tree[];
   parent?: Tree;
-  data?: Asset;
+  asset?: Asset;
 }
 export class Tree {
   private _id: string;
@@ -17,7 +17,7 @@ export class Tree {
   private _childrean: Tree[];
   private _parent?: Tree;
   private _level: number;
-  private _data?: Asset;
+  private _asset?: Asset;
 
   constructor(props: TreeProps) {
     this._id = props.id;
@@ -26,7 +26,7 @@ export class Tree {
     this._childrean = props.childrean;
     this._parent = props.parent;
     this._level = props.level;
-    this._data = props.data;
+    this._asset = props.asset;
   }
 
   static initTree(
@@ -109,7 +109,7 @@ export class Tree {
         level: parent.level + 1,
         childrean: [],
         parent,
-        data: child.type === 'location' ? undefined : assets[child.id].data,
+        asset: child.type === 'location' ? undefined : assets[child.id].data,
       });
       tree.childrean = this.initChildrean(
         LocationFromApi,
@@ -129,7 +129,7 @@ export class Tree {
         level: parent.level + 1,
         childrean: [],
         parent,
-        data: asset.data,
+        asset: asset.data,
       });
       tree.childrean = this.initChildrean(LocationFromApi, assets, child, tree);
       return tree;
@@ -164,12 +164,12 @@ export class Tree {
   get level() {
     return this._level;
   }
-  get asset() {
-    return this._data;
+  get asset(): Asset | undefined {
+    return this._asset;
   }
 
-  set data(data: Asset) {
-    this._data = data;
+  set asset(data: Asset) {
+    this._asset = data;
   }
 
   set childrean(childrean: Tree[]) {

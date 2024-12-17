@@ -75,7 +75,7 @@ function filterTree(
           parentId: tree.parentId,
           level: tree.level,
           parent: tree.parent,
-          data: tree.asset,
+          asset: tree.asset,
           childrean,
         });
       }
@@ -93,7 +93,7 @@ function filterTree(
       parentId: tree.parentId,
       level: tree.level,
       parent: tree.parent,
-      data: tree.asset,
+      asset: tree.asset,
       childrean: childrean,
     });
   }
@@ -108,7 +108,7 @@ function filterTree(
     parentId: tree.parentId,
     level: tree.level,
     parent: tree.parent,
-    data: tree.asset,
+    asset: tree.asset,
     childrean,
   });
 }
