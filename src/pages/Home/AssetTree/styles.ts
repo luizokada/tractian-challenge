@@ -67,6 +67,7 @@ export const NotFoundComponent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 16px;
   padding: 24px;
   flex: 1;
   background-color: ${({ theme }) => theme.Colors.Gray._500};
