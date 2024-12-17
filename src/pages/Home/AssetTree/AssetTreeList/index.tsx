@@ -31,14 +31,11 @@ const AssetTreeList: React.FC<AssetTreeListProps> = ({
   const [remainRenderRight, setRemainRenderRight] = React.useState(renderRight);
   const [renderedChilds, setRenderedChilds] = React.useState<string[]>([]);
   const { selectedAsset, setSelectedAsset } = useContext(CompanieContext);
-
   useMemo(() => {
     if (currentNode.id === 'root' && Tree.calcTreeSize(currentNode) < 1000) {
-      setRemainRenderRight(renderRight);
       return;
     }
     setRemainRenderRight(1);
-    setRenderedChilds([]);
   }, [activeFilter]);
 
   const shouldRenderBorder = useMemo(() => {

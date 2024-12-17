@@ -20,47 +20,73 @@ import {
   HomeContainer,
 } from './styles';
 
+function filterString(stringTofilter: string, search: string) {
+  const normalizedName = stringTofilter
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  return normalizedName.includes(
+    search
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase(),
+  );
+}
+
 function getFilteredAssets(assets: Asset[], filter: FilterType): Asset[] {
   return assets.filter((asset) => {
     const statusFilter = filter.status ? asset.status === filter.status : true;
     const typeFilter = filter.type ? asset.sensorType === filter.type : true;
-    return statusFilter && typeFilter;
+
+    const searchFilter = filter.search
+      ? filterString(asset.name, filter.search)
+      : true;
+
+    return statusFilter && typeFilter && searchFilter;
   });
 }
 
-function getAssetsBySearch(assets: Asset[], search: string): Asset[] {
-  return assets.filter((asset) => {
-    const normalizedName = asset.name
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-    return normalizedName.includes(
-      search
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase(),
-    );
-  });
-}
-function getLocationsBySearch(location: Location[], search: string) {
-  return location.filter((location) => {
-    const normalizedName = location.name
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-    return normalizedName.includes(
-      search
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase(),
-    );
-  });
-}
-
-function filterTree(tree: Tree, whiteList: String[]): Tree | undefined {
-  if (!whiteList.length) {
+function filterTree(
+  tree: Tree,
+  whiteList: String[],
+  activeFilter: FilterType,
+): Tree | undefined {
+  const search = activeFilter.search;
+  const isSomeFilterActive = !!activeFilter.status || !!activeFilter.type;
+  if (!whiteList.length && !search) {
     return tree;
   }
+
+  if (!whiteList.length && tree.asset) {
+    return;
+  }
+  if (search) {
+    if (filterString(tree.name, search) && !tree.asset) {
+      const childrean = tree.childrean
+        .map((child) => filterTree(child, whiteList, activeFilter))
+        .filter((child) => !!child);
+
+      if (
+        childrean.length > 0 ||
+        (tree.childrean.length === 0 && !isSomeFilterActive)
+      ) {
+        return new Tree({
+          id: tree.id,
+          name: tree.name,
+          parentId: tree.parentId,
+          level: tree.level,
+          parent: tree.parent,
+          data: tree.asset,
+          childrean,
+        });
+      }
+    }
+  }
+
+  const childrean = tree.childrean
+    .map((child) => filterTree(child, whiteList, activeFilter))
+    .filter((child) => !!child);
 
   if (whiteList.includes(tree.id)) {
     return new Tree({
@@ -70,12 +96,10 @@ function filterTree(tree: Tree, whiteList: String[]): Tree | undefined {
       level: tree.level,
       parent: tree.parent,
       data: tree.asset,
-      childrean: !tree.asset ? tree.childrean : [],
+      childrean: childrean,
     });
   }
-  const childrean = tree.childrean
-    .map((child) => filterTree(child, whiteList))
-    .filter((child) => !!child);
+
   if (childrean.length === 0) {
     return;
   }
@@ -212,39 +236,18 @@ const Home: React.FC = () => {
     }
 
     const assetWhiteList: String[] = [];
-    if (activeFilter.type || activeFilter.status) {
+    if (activeFilter.type || activeFilter.status || activeFilter.search) {
       assetWhiteList.push(
         ...getFilteredAssets(assets, activeFilter).map((asset) => asset.id),
       );
     }
 
-    if (activeFilter.search) {
-      assetWhiteList.push(
-        ...getAssetsBySearch(assets, activeFilter.search).map(
-          (asset) => asset.id,
-        ),
-      );
-    }
+    const whiteListToFilter = assetWhiteList;
 
-    const locationWhiteList: String[] = [];
-    if (activeFilter.search) {
-      locationWhiteList.push(
-        ...getLocationsBySearch(locations, activeFilter.search).map(
-          (location) => location.id,
-        ),
-      );
-    }
-
-    const whiteListToFilter = [
-      ...new Map(assetWhiteList.map((item) => [item, item])).keys(),
-      ...new Map(locationWhiteList.map((item) => [item, item])).keys(),
-      ,
-    ].filter((item) => !!item);
-
-    if (whiteListToFilter.length === 0) {
+    if (whiteListToFilter.length === 0 && !activeFilter.search) {
       return;
     }
-    const tree = filterTree(currentTree, whiteListToFilter);
+    const tree = filterTree(currentTree, whiteListToFilter, activeFilter);
     return tree;
   }, [currentTree, activeFilter, assets, locations]);
 
