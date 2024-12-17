@@ -67,10 +67,8 @@ function filterTree(
         .map((child) => filterTree(child, whiteList, activeFilter))
         .filter((child) => !!child);
 
-      if (
-        childrean.length > 0 ||
-        (tree.childrean.length === 0 && !isSomeFilterActive)
-      ) {
+      console.log(tree.name, childrean);
+      if (childrean.length > 0 || !isSomeFilterActive) {
         return new Tree({
           id: tree.id,
           name: tree.name,

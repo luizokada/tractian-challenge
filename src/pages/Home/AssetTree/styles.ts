@@ -62,3 +62,19 @@ export const LoaderWrapper = styled.div`
   height: 100%;
   flex: 1;
 `;
+
+export const NotFoundComponent = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  flex: 1;
+  background-color: ${({ theme }) => theme.Colors.Gray._500};
+  border-radius: 8px;
+  > p {
+    font-size: 16px;
+    text-align: center;
+    color: ${({ theme }) => theme.Colors.Gray._700};
+    line-height: 150%;
+  }
+`;

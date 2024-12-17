@@ -6,6 +6,7 @@ import {
   AssetTreeListWrapper,
   AssetTreeWrapper,
   LoaderWrapper,
+  NotFoundComponent,
   SearchInputContainer,
 } from './styles';
 import { useIsFetchingQueries } from '../../../hooks/useIsFetchingQueries';
@@ -44,6 +45,12 @@ const AssetTree: React.FC<AssetTreeProps> = ({
     setSearchTerm(activeFilter.search || '');
   }, [activeFilter.search]);
 
+  const isSomeFitlerActive = useMemo(() => {
+    return (
+      !!activeFilter.status || !!activeFilter.type || !!activeFilter.search
+    );
+  }, [activeFilter]);
+
   return (
     <AssetTreeWrapper>
       <SearchInputContainer
@@ -78,6 +85,11 @@ const AssetTree: React.FC<AssetTreeProps> = ({
       )}
       {!isLoading && (
         <AssetTreeListWrapper>
+          {!tree && isSomeFitlerActive && (
+            <NotFoundComponent>
+              <p>Nenhum ativo encontrado com os filtros selecionados</p>
+            </NotFoundComponent>
+          )}
           {tree && (
             <Suspense
               fallback={<div>Component1 are loading please wait...</div>}
